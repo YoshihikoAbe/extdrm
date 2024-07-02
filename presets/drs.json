@@ -1,0 +1,6 @@
+{
+    "key_salt": "ZGFuY2VydXNobXVzaWNjcnlwdG9rZXlfLytFWkd3ajFvbQ==",
+    "path_salt": "c2FsdA==",
+    "magic": 111018739471229161679301926522028459829,
+    "disable_crc": true
+}
