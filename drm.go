@@ -18,10 +18,11 @@ import (
 )
 
 type DrmConfig struct {
-	KeySalt    []byte   `json:"key_salt"`
-	PathSalt   []byte   `json:"path_salt"`
-	Magic      *big.Int `json:"magic"`
-	DisableCRC bool     `json:"disable_crc"`
+	KeySalt       []byte        `json:"key_salt"`
+	PathSalt      []byte        `json:"path_salt"`
+	Magic         *big.Int      `json:"magic"`
+	DisableCRC    bool          `json:"disable_crc"`
+	SaltGenerator SaltGenerator `json:"salt_generator"`
 }
 
 type DrmFile struct {
@@ -171,7 +172,8 @@ func (state *readState) makeReader(rd io.Reader, spath string) io.Reader {
 }
 
 func (state *readState) deriveKey(spath string) (key []byte, iv *big.Int) {
-	state.sha384.Write(state.KeySalt)
+	salt := state.SaltGenerator.KeySalt(state.KeySalt, spath)
+	state.sha384.Write(salt)
 	state.sha384.Write([]byte(spath))
 	sum := state.sha384.Sum(nil)
 
@@ -184,8 +186,9 @@ func (state *readState) deriveKey(spath string) (key []byte, iv *big.Int) {
 }
 
 func (state *readState) hashPath(spath string) string {
+	salt := state.SaltGenerator.PathSalt(state.PathSalt, spath)
 	hash := sha1.New()
-	hash.Write(state.PathSalt)
+	hash.Write(salt)
 	hash.Write([]byte(spath))
 	sum := hex.EncodeToString(hash.Sum(nil))
 	return fmt.Sprintf("/%c/%c/%c/%s", sum[0], sum[2], sum[4], sum)
