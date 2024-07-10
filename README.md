@@ -30,6 +30,23 @@ After a successful dump, you may perform a file check by running `extdrm verify 
 This repository includes several preset files responsible for controlling the decryption process. These preset files can be found under the `presets` directory.
 
 List of included preset files and their respective games:
+
+### Arcade
+
 - presets/drs.json: DANCERUSH STARDOM
 - presets/resident.json: beatmania IIDX 30 RESIDENT ~ current
 - presets/vividwave.json: SOUND VOLTEX VIVID WAVE ~ current
+- presets/around.json: DANCE aROUND
+
+### コナステ/Konasute:
+
+- presets/eac/bonga.json: Bombergirl
+- presets/eac/ddr.json: DanceDanceRevolution GRAND PRIX
+- presets/eac/gitadora.json: GITADORA
+- presets/infinitas_2020.json: beatmania IIDX INFINITAS 2020
+- presets/infinitas_2020_cache.json: beatmania IIDX INFINITAS 2020 (cache)
+- presets/infinitas_2024.json: beatmania IIDX INFINITAS 2024
+- presets/infinitas_2024_cache.json: beatmania IIDX INFINITAS 2024 (cache)
+- presets/eac/nost.json: NOSTALGIA
+- presets/eac/popn.json: pop'n music Lively
+- presets/eac/sdvx.json: SOUND VOLTEX EXCEED GEAR
