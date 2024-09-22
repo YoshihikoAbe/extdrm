@@ -7,6 +7,7 @@ import (
 	"crypto/sha512"
 	"encoding/hex"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"hash"
 	"io"
@@ -123,16 +124,16 @@ func (state *readState) run() error {
 	return nil
 }
 
-func (state *readState) readMetadata() (*Metadata, error) {
-	const filename = "/__metadata.metatxt"
+const metaFilename = "/__metadata.metatxt"
 
-	fp, err := state.openFile(state.hashPath(filename))
+func (state *readState) readMetadata() (*Metadata, error) {
+	f, err := state.openMetadata()
 	if err != nil {
 		return nil, err
 	}
-	defer fp.Close()
+	defer f.Close()
 
-	b, err := io.ReadAll(state.makeReader(fp, filename))
+	b, err := io.ReadAll(state.makeReader(f, metaFilename))
 	if err != nil {
 		return nil, err
 	}
@@ -146,10 +147,28 @@ func (state *readState) readMetadata() (*Metadata, error) {
 	state.ch <- DrmFile{
 		Reader: bytes.NewReader(b),
 		Closer: io.NopCloser(nil),
-		Path:   filename,
+		Path:   metaFilename,
 	}
 
 	return mdata, nil
+}
+
+func (state *readState) openMetadata() (f *os.File, err error) {
+	root := state.root
+	hash := state.hashPath(metaFilename)
+	for _, dir := range []string{"/", "/x", "/x2"} {
+		state.root = root + dir
+		if f, err = state.openFile(hash); err == nil {
+			break
+		}
+		if !errors.Is(err, os.ErrNotExist) {
+			return
+		}
+	}
+	if f == nil {
+		err = errors.New("metadata file (" + hash + ") not found")
+	}
+	return
 }
 
 func (state *readState) openFile(filename string) (*os.File, error) {
