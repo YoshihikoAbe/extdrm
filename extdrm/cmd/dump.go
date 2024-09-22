@@ -2,8 +2,8 @@ package cmd
 
 import (
 	"encoding/json"
-	"fmt"
 	"io"
+	"log"
 	"os"
 	"path"
 	"runtime"
@@ -49,17 +49,17 @@ func runDump(cmd *cobra.Command, args []string) {
 
 	data, err := os.ReadFile(filename)
 	if err != nil {
-		fatal(err)
+		log.Fatalln(err)
 	}
 	config := &extdrm.DrmConfig{}
 	if err := json.Unmarshal(data, config); err != nil {
-		fatal(err)
+		log.Fatalln(err)
 	}
 
 	start := time.Now()
 	ch, err := extdrm.ReadFS(*config, src)
 	if err != nil {
-		fatal(err)
+		log.Fatalln(err)
 	}
 
 	wg := sync.WaitGroup{}
@@ -78,24 +78,24 @@ func runDump(cmd *cobra.Command, args []string) {
 
 					dir, _ := path.Split(file.Path)
 					if err := os.MkdirAll(path.Join(dest, dir), 0777); err != nil {
-						fmt.Println(err)
+						log.Println(err)
 						return
 					}
 
 					out, err := os.Create(path.Join(dest, file.Path))
 					if err != nil {
-						fmt.Println(err)
+						log.Println(err)
 						return
 					}
 					defer out.Close()
 
 					if _, err := io.Copy(out, file); err != nil {
-						fmt.Println(err)
+						log.Println(err)
 					}
 				}(file)
 			}
 		}()
 	}
 	wg.Wait()
-	fmt.Println("time elapsed:", time.Since(start))
+	log.Println("time elapsed:", time.Since(start))
 }
